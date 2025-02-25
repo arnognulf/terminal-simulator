@@ -8,7 +8,7 @@
 #ifdef __FreeBSD__
 # define SAMPLES 64 /* must be a power of two */
 #else
-# define SAMPLES (FREQUENCY * 3520 / 2764800)
+# define SAMPLES (FREQUENCY * 3520 / 2764800 * 2)
 #endif
 
 int sound_scope;
@@ -20,7 +20,7 @@ static const float capacitance = 6.8e-6; //C8 in schematic.
 static const float resistance1 = 390.0; //R16 in schematic.
 static const float resistance2 = 16.0; //Speaker, just a guess.
 
-static u8 buffer[SAMPLES];
+static u16 buffer[SAMPLES];
 static int flip_flop;
 
 static void speaker (void);
@@ -32,7 +32,7 @@ void bell (void)
   flip_flop = 0;
 }
 
-static u8 sample (void)
+static u16 sample (void)
 {
   const float dt = 1.0 / FREQUENCY;
   float current;
@@ -49,7 +49,7 @@ static u8 sample (void)
       flip_flop = 1;
     //LOG (SND, "Discharging: %.3fA, %.6fC, %.2fV", current, charge, voltage);
   }
-  return (u8)(255.0 * voltage / 5.0);
+  return (u16)(65535.0 * voltage / 5.0);
 }
 
 static void speaker (void)
@@ -68,7 +68,7 @@ static void speaker (void)
     buffer[i] = sample ();
   SDL_QueueAudio (dev, buffer, sizeof buffer);
   if (sound_scope)
-    sdl_sound (buffer, sizeof buffer);
+    sdl_sound ((u8*)buffer, sizeof buffer);
   add_event (2764800 * SAMPLES / FREQUENCY, &sound_event);
 }
 
@@ -84,7 +84,7 @@ void reset_sound (void)
 
   memset (&want, 0, sizeof want);
   want.freq = FREQUENCY;
-  want.format = AUDIO_U8;
+  want.format = AUDIO_U16;
   want.channels = 1;
   want.samples = SAMPLES;
 
