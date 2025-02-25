@@ -253,7 +253,7 @@ void sdl_init (const char *title, int scale, int full)
 
   window = SDL_CreateWindow (title,
 			     SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-			     WIDTH*scale, HEIGHT*scale, 0);
+			     WIDTH*scale, HEIGHT*scale, SDL_WINDOW_RESIZABLE);
   if (window == NULL)
     //panic("SDL_CreateWindowAndRenderer failed: %s\n", SDL_GetError ());
     ;
