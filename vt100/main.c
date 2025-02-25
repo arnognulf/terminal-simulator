@@ -59,8 +59,8 @@ void bdos_out (u8 port, u8 data)
   }
 }
 
-Uint32 ticks;
-unsigned long long previous;
+int64_t ticks;
+int64_t previous;
 
 static void throttle (void)
 {
@@ -68,7 +68,7 @@ static void throttle (void)
   previous = get_cycles () - previous;
   ticks *= 2765;
   if (previous > 1000000)
-    LOG (CPU, "Large number of cycles: %llu", previous);
+    LOG (CPU, "Large number of cycles: %"PRIu64"", previous);
   else if (previous > ticks)
     SDL_Delay ((previous - ticks) / 2765);
   ticks = SDL_GetTicks ();
